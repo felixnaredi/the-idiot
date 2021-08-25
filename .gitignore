@@ -1,0 +1,8 @@
+/target
+history.json
+
+# Local IDE settings
+/.vscode
+
+# Local archive
+/.archive

@@ -1,0 +1,16 @@
+[package]
+name = "the-idiot"
+version = "0.1.0"
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+chrono = { version = "0.4", features = ["serde"] }
+cursive = "0.16"
+rand = "0.7.0"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+uuid = { version = "0.8", features = ["v4", "serde"] }
+log = "0.4.14"
+getset = "0.1.1"
