@@ -10,7 +10,7 @@ chrono = { version = "0.4", features = ["serde"] }
 cursive = "0.16"
 getset = "0.1.1"
 log = "0.4.14"
-rand = "0.7.0"
+rand = "0.8.4"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 uuid = { version = "0.8", features = ["v4", "serde"] }

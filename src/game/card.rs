@@ -137,7 +137,7 @@ impl Deck
         let len = cards.len();
 
         for i in 0..cards.len() {
-            let j = rng.gen_range(i, len);
+            let j = rng.gen_range(i..len);
             cards.swap(i, j);
         }
     }

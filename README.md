@@ -5,7 +5,16 @@ name also stems from the simple rules.
 
 ## Installation
 
-Run the command `cargo run` and play the game in the terminal!
+Make sure you have the *nigthly* channel installed. Otherwise, install it by running
+the command:
+```
+rustup install nigthly
+```
+
+To run the game:
+```
+cargo run
+```
 
 ![Some gameplay in action](./images/gameplay.png)
 

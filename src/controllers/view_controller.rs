@@ -78,7 +78,7 @@ impl ViewController
                             }
                             Mode::PlaceFrom => {
                                 from_index.upgrade().map(|from_index| {
-                                    from_index.borrow_mut().insert(index);
+                                    let _ = from_index.borrow_mut().insert(index);
                                 });
                                 set_mode(s, Mode::PlaceTo);
                             }
