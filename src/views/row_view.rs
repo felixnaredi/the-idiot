@@ -1,6 +1,7 @@
 use std::rc::Rc;
 
 use cursive::{
+    align::HAlign,
     direction::Direction,
     event::{
         Callback,
@@ -17,12 +18,14 @@ use cursive::{
     view::View,
     Cursive,
     Printer,
+    Rect,
     Vec2,
 };
 use getset::{
     Getters,
     Setters,
 };
+use unicode_width::UnicodeWidthStr;
 
 use crate::{
     controllers::Mode,
@@ -83,50 +86,6 @@ impl RowView
 }
 
 // -------------------------------------------------------------------------------------------------
-// Draw helper functions.
-// -------------------------------------------------------------------------------------------------
-
-fn display_card(card: &Card) -> String
-{
-    let text = format!(" {}", card);
-    if text.len() > 3 {
-        text
-    } else {
-        format!("{} ", text)
-    }
-}
-
-fn draw_card(card: &Card, select: bool, printer: &Printer)
-{
-    let color = match card.suit() {
-        Suit::Hearts | Suit::Diamonds => Color::Dark(BaseColor::Red),
-        Suit::Spades | Suit::Clubs => Color::Dark(BaseColor::Black),
-    };
-
-    let style = if printer.focused && select {
-        ColorStyle::new(color, Color::Light(BaseColor::Yellow))
-    } else {
-        ColorStyle::front(color)
-    };
-
-    printer.with_color(style, |printer| {
-        printer.print((0, 0), &display_card(card));
-    });
-}
-
-fn draw_empty(select: bool, printer: &Printer)
-{
-    if select {
-        printer.with_color(
-            ColorStyle::back(Color::Light(BaseColor::Yellow)),
-            |printer| {
-                printer.print((0, 0), "     ");
-            },
-        );
-    }
-}
-
-// -------------------------------------------------------------------------------------------------
 // View
 // -------------------------------------------------------------------------------------------------
 
@@ -135,11 +94,33 @@ impl View for RowView
     fn draw(&self, printer: &Printer)
     {
         if self.cards.is_empty() {
-            draw_empty(printer.focused, printer);
+            // Check if empty row should be focused.
+            if printer.focused {
+                printer.with_color(
+                    ColorStyle::back(Color::Light(BaseColor::Yellow)),
+                    |printer| {
+                        printer.print((0, 0), "     ");
+                    },
+                );
+            }
         } else {
             // Draw the cards in the row.
             for (y, card) in self.cards.iter().enumerate() {
-                draw_card(card, self.cards.len() - 1 == y, &printer.offset((0, y)));
+                let color = match card.suit() {
+                    Suit::Hearts | Suit::Diamonds => Color::Dark(BaseColor::Red),
+                    Suit::Spades | Suit::Clubs => Color::Dark(BaseColor::Black),
+                };
+
+                let style = if printer.focused && self.cards.len() - 1 == y {
+                    ColorStyle::new(color, Color::Light(BaseColor::Yellow))
+                } else {
+                    ColorStyle::front(color)
+                };
+
+                let s = String::from(card);
+                let offset = HAlign::Center.get_offset(s.width(), printer.size.x);
+
+                printer.with_color(style, |printer| printer.print((offset, y), &s));
             }
         }
     }
@@ -170,8 +151,8 @@ impl View for RowView
         }
     }
 
-    fn required_size(&mut self, _: Vec2) -> Vec2
+    fn important_area(&self, _: Vec2) -> Rect
     {
-        Vec2::new(5, self.cards.len())
+        Rect::from_size((0, 0), (5, self.cards.len()))
     }
 }

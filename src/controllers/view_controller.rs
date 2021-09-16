@@ -98,7 +98,8 @@ impl ViewController
                             }
                         });
                     })
-                    .with_name(name),
+                    .with_name(name)
+                    .fixed_width(6),
             )
         }
 

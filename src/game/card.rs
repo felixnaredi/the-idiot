@@ -1,8 +1,3 @@
-use std::fmt::{
-    self,
-    Display,
-};
-
 use getset::Getters;
 use rand::Rng;
 use serde::{
@@ -19,6 +14,29 @@ pub enum Suit
     Spades,
 }
 
+impl From<&Suit> for String
+{
+    fn from(suit: &Suit) -> Self
+    {
+        use Suit::*;
+
+        /*
+        match suit {
+            Spades => String::from("♠️"),
+            Hearts => String::from("♥️"),
+            Clubs => String::from("♣️"),
+            Diamonds => String::from("♦️"),
+        }
+        */
+        match suit {
+            Spades => String::from("<<"),
+            Hearts => String::from("<3"),
+            Clubs => String::from("cc"),
+            Diamonds => String::from("<>"),
+        }
+    }
+}
+
 #[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub enum Rank
 {
@@ -27,6 +45,22 @@ pub enum Rank
     Knight,
     Queen,
     King,
+}
+
+impl From<&Rank> for String
+{
+    fn from(rank: &Rank) -> Self
+    {
+        use Rank::*;
+
+        match rank {
+            Ace => String::from("A"),
+            Num(x) => format!("{}", x),
+            Knight => String::from("Kn"),
+            Queen => String::from("Q"),
+            King => String::from("K"),
+        }
+    }
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, Getters, Hash, PartialEq, Serialize)]
@@ -52,39 +86,11 @@ impl Card
     }
 }
 
-impl Display for Card
+impl From<&Card> for String
 {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result
+    fn from(card: &Card) -> Self
     {
-        use Rank::*;
-        use Suit::*;
-
-        match self.rank() {
-            Ace => write!(f, "A"),
-            Num(x) => write!(f, "{}", x),
-            Knight => write!(f, "Kn"),
-            Queen => write!(f, "Q"),
-            King => write!(f, "K"),
-        }?;
-        match self.suit() {
-            Spades => write!(f, "<<"),
-            Hearts => write!(f, "<3"),
-            Clubs => write!(f, "cc"),
-            Diamonds => write!(f, "<>"),
-            // TODO:
-            //   I would like to use Unicode characters for the suit but it doesn't render well
-            //   when the focus is changed. My guess is that uses amount of bytes and not amount of
-            //   characters when redrawing.
-            //
-            //   Maybe I have just missed some setting... Otherwise it would be neat addition for
-            //   cursive.
-            /*
-            Spades => write!(f, "♠️"),
-            Hearts => write!(f, "♥️"),
-            Clubs => write!(f, "♣️"),
-            Diamonds => write!(f, "♦️"),
-            */
-        }
+        format!("{}{}", String::from(card.rank()), String::from(card.suit()))
     }
 }
 
