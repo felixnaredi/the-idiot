@@ -5,11 +5,6 @@ use std::{
 };
 
 use cursive::{
-    theme::{
-        BaseColor,
-        Color,
-        ColorStyle,
-    },
     view::{
         Nameable,
         Resizable,
@@ -18,7 +13,6 @@ use cursive::{
         Button,
         Dialog,
         DummyView,
-        Layer,
         LinearLayout,
         NamedView,
     },
@@ -32,10 +26,18 @@ use crate::{
         GameResult,
         RowIndex,
     },
-    views::RowView,
+    views::{
+        HighlightView,
+        RowView,
+    },
 };
 
-#[derive(Debug, Clone)]
+/// The type of view the place button has. It is used to force the view to have exactly this type
+/// since `Cursive::call_on_name` does not have any type safety and will simply do nothing if there
+/// is a type missmatch.
+type PlaceButton = HighlightView<NamedView<Button>>;
+
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub enum Mode
 {
     Eliminate,
@@ -121,15 +123,15 @@ impl ViewController
                         })
                         .child(
                             // TODO:
-                            //   It does not render well when the button is highlighted due to place
-                            //   mode being enabled.
-                            // TODO:
                             //   If the button is disabled after a place and the player moved the
                             //   focus to the buttons, the focus will end up at the view
                             //   'new-game-button'. It would be preferable if it focused the view
                             //   'deck-button' instead.
-                            Layer::new(Button::new("Place", |_| {}).with_name("place-button"))
-                                .with_name("place-button-layer"),
+                            HighlightView::new(
+                                Button::new("Place", |_| {}).with_name("place-button"),
+                            )
+                            .with_name("place-button-hightlight")
+                                as NamedView<PlaceButton>,
                         )
                         .child(DummyView)
                         .child({
@@ -251,27 +253,12 @@ fn set_mode(s: &mut Cursive, mode: Mode)
         });
     }
 
-    match mode {
-        Mode::Eliminate => {
-            s.call_on_name(
-                "place-button-layer",
-                |view: &mut Layer<NamedView<Button>>| {
-                    view.set_color(ColorStyle::inherit_parent());
-                },
-            );
-        }
-        Mode::PlaceFrom | Mode::PlaceTo => {
-            s.call_on_name(
-                "place-button-layer",
-                |view: &mut Layer<NamedView<Button>>| {
-                    view.set_color(ColorStyle::back(Color::Light(BaseColor::Yellow)));
-                },
-            );
-        }
-    }
-
     s.call_on_name("place-button", |button: &mut Button| match mode {
         Mode::Eliminate => button.set_callback(|s| set_mode(s, Mode::PlaceFrom)),
         _ => button.set_callback(|s| set_mode(s, Mode::Eliminate)),
+    });
+
+    s.call_on_name("place-button-hightlight", |highlight: &mut PlaceButton| {
+        highlight.set_highlighted(mode != Mode::Eliminate)
     });
 }
