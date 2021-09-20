@@ -18,7 +18,6 @@ use cursive::{
     view::View,
     Cursive,
     Printer,
-    Rect,
     Vec2,
 };
 use getset::{
@@ -151,8 +150,8 @@ impl View for RowView
         }
     }
 
-    fn important_area(&self, _: Vec2) -> Rect
+    fn required_size(&mut self, _: Vec2) -> Vec2
     {
-        Rect::from_size((0, 0), (5, self.cards.len()))
+        Vec2::from((6, self.cards.len()))
     }
 }
